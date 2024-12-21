@@ -18,6 +18,17 @@ aioredis = "^2.0.1"
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.8.4"
 
+[tool.ruff]
+line-length = 80
+target-version = "py310"
+
+[tool.ruff.lint]
+include = ["F", "E", "W", "I", "N", "D", "UP", "ANN"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
