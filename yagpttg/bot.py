@@ -31,7 +31,7 @@ LOG_FORMAT = (
 # ==========
 
 @dp.errors()
-async def catch_errors(event: ErrorEvent):
+async def catch_errors(event: ErrorEvent) -> None:
     """Простой обработчик для ошибок."""
     logger.warning(event)
     logger.exception(event.exception)
@@ -40,7 +40,7 @@ async def catch_errors(event: ErrorEvent):
 # Главная функция запуска бота
 # ============================
 
-async def main():
+async def main() -> None:
     """Запускает бота.
 
     Настраивает loguru.

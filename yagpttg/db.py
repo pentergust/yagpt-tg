@@ -7,6 +7,7 @@
 
 from tortoise import Model, fields
 
+
 class User(Model):
     """Пользователь бота.
 
