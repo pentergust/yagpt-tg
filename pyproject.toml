@@ -13,6 +13,7 @@ loguru = "^0.7.3"
 tortoise-orm = "^0.22.2"
 asyncpg = "^0.30.0"
 aioredis = "^2.0.1"
+pydantic-settings = "^2.7.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -23,7 +24,8 @@ line-length = 80
 target-version = "py310"
 
 [tool.ruff.lint]
-include = ["F", "E", "W", "I", "N", "D", "UP", "ANN"]
+select = ["F", "E", "W", "I", "N", "D", "UP", "ANN"]
+ignore = ["D211", "D212", "D213"]
 
 [tool.ruff.format]
 quote-style = "double"
