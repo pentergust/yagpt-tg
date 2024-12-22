@@ -39,6 +39,7 @@ poetry run python -m yagpttg
 - [@pentergust](https://www.github.com/pentergust): Главный суетолог.
 - [@Roman12e](https://github.com/Roman12e): Лучший маркетолог.
 - [@Wst-dev](https://github.com/Wst-dev): Мощный разработчик.
+- [@Geogarti](https://github.com/Geogarti): Маэстро баз данных.
 
 ## Поддержка
 

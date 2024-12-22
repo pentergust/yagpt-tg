@@ -1,0 +1,2 @@
+class YandexGPTAPI:
+    pass
