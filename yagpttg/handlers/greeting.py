@@ -8,7 +8,19 @@
 """
 
 from aiogram import Router
+from aiogram.filters import CommandStart
+from aiogram import types
+
+
 
 router = Router(name="Greeting")
 
 # TODO: Действия при первом запуске бота пользователем
+
+
+@router.message(CommandStart())
+async def cmd_start(message: types.Message):
+    await message.answer(text='Hello! This Yandex Gpt bot')
+
+
+
