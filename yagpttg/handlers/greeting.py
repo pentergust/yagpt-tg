@@ -7,11 +7,8 @@
 После успешное регистрации заносит данные пользователя в базу данных.
 """
 
-from aiogram import Router
+from aiogram import Router, types
 from aiogram.filters import CommandStart
-from aiogram import types
-
-
 
 router = Router(name="Greeting")
 
@@ -19,8 +16,6 @@ router = Router(name="Greeting")
 
 
 @router.message(CommandStart())
-async def cmd_start(message: types.Message):
+async def cmd_start(message: types.Message) -> None:
+    """Приветствуем нового пользователя."""
     await message.answer(text='Hello! This Yandex Gpt bot')
-
-
-
