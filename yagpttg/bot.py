@@ -73,8 +73,8 @@ async def main() -> None:
 
     logger.info("Init db connection ...")
     await Tortoise.init(
-        db_url=config.db_dsn,
-        modules={"models": ["maubot.db"]}
+        db_url=str(config.db_dsn),
+        modules={"models": ["yagpttg.db"]}
     )
     await Tortoise.generate_schemas()
 
