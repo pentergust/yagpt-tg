@@ -1,6 +1,8 @@
 """Обращение к YandexGPI API.
 
 Предоставляет класс для общения с API от имени пользователя.
+
+TODO: Использование Aiohttp и обращение с Yandex cloud API
 """
 
 import requests
