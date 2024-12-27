@@ -33,9 +33,9 @@ async def register_user_call(query: CallbackQuery, user: User | None) -> None:
         return await query.answer("🍓 Вы уже проходили регистрацию.")
 
     user = await User.create(
-        id=query.message.from_user.id,
-        first_name=query.message.from_user.first_name,
-        last_name=query.message.from_user.first_name
+        id=query.from_user.id,
+        first_name=query.from_user.first_name,
+        last_name=query.from_user.first_name
     )
 
     await query.message.answer(messages.START_WORK)

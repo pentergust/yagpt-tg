@@ -46,7 +46,7 @@ async def game_middleware(
         user = await User.get_or_none(id=event.from_user.id)
     elif isinstance(event, CallbackQuery):
         if event.message is not None:
-            user = await User.get_or_none(id=event.message.from_user.id)
+            user = await User.get_or_none(id=event.from_user.id)
         else:
             user = None
 
