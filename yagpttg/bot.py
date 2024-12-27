@@ -4,14 +4,17 @@
 """
 
 import sys
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 from aiogram import Bot, Dispatcher
-from aiogram.types import ErrorEvent
+from aiogram.types import CallbackQuery, ErrorEvent, Message, Update
 from aiogram.utils.token import TokenValidationError
 from loguru import logger
 from tortoise import Tortoise
 
 from yagpttg.config import config, default
+from yagpttg.db import User
 from yagpttg.handlers import ROUTERS
 
 # Константы
@@ -26,6 +29,30 @@ LOG_FORMAT = (
     "{file}:{function} "
     "<lvl>{message}</>"
 )
+
+@dp.message.middleware
+@dp.callback_query.middleware
+async def game_middleware(
+    handler: Callable[[Update, dict[str, Any]], Awaitable[Any]],
+    event: Update,
+    data: dict[str, Any]
+) -> Awaitable[Any]:
+    """Предоставляет сохранённые данные пользователя из базы данных.
+
+    Для того чтобы добавить нового пользователя, используется форма
+    регистрации при первом запуске бота.
+    """
+    if isinstance(event, Message):
+        user = await User.get_or_none(id=event.from_user.id)
+    elif isinstance(event, CallbackQuery):
+        if event.message is not None:
+            user = await User.get_or_none(id=event.message.from_user.id)
+        else:
+            user = None
+
+    data["user"] = user
+
+    return await handler(event, data)
 
 # Middleware
 # ==========

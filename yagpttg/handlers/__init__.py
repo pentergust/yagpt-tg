@@ -7,8 +7,10 @@
 from yagpttg.handlers import gpt, greeting
 
 ROUTERS = (
-    gpt.router,
-    greeting.router
+    greeting.router,
+
+    # Загружается последним, поскольку перехватывает все сообщения
+    gpt.router
 )
 
 __all__ = ("ROUTERS",)
