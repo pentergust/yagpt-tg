@@ -10,6 +10,8 @@
 from aiogram import Router, types
 from aiogram.filters import CommandStart
 
+from yagpttg import keyboards, messages
+
 router = Router(name="Greeting")
 
 # TODO: Действия при первом запуске бота пользователем
@@ -18,4 +20,5 @@ router = Router(name="Greeting")
 @router.message(CommandStart())
 async def cmd_start(message: types.Message) -> None:
     """Приветствуем нового пользователя."""
-    await message.answer(text='Hello! This Yandex Gpt bot')
+    await message.answer(messages.GREETING, reply_markup=keyboards.GREETING)
+
