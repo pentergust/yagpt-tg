@@ -18,12 +18,15 @@ class BotConfig(BaseSettings):
     изменены.
 
     - bot_token: Токен от Telegram бота.
-    - db_url: Путь для подключения к базе данных.
+    - db_dsn: Данные для подключения к базе данных.
+    - redis_dsn: Данные для подключения к кешу.
+    - ya_gpt_key: API ключ для взаимодействия с Yandex GPT.
     """
 
     bot_token: SecretStr
     db_dsn: PostgresDsn
     redis_dsn: RedisDsn
+    ya_gpt_token: SecretStr
 
     # Настраиваем подгрузку из .env файла
     model_config = SettingsConfigDict(
