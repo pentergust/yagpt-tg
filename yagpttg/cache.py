@@ -1,11 +1,10 @@
 """Кеширование запросов к API.
 
-TODO: Реализация кеша с использованием aioredis.
 """
 
 import json
-
-import redis
+import asyncio
+import redis.asyncio as redis
 
 # Константы
 # =========
@@ -29,22 +28,23 @@ class RedisCacheStorage:
         else:
             self.time = _CACHE_TIME
 
-    def bd(self, key, question = None, answer = None) -> str | None:
+    async def bd(self, key, question = None, answer = None) -> str | None:
         key = str(key)
-        exs = self.client.exists(key)
+        exs = await self.client.exists(key)
 
         if question is None or answer is None:
             if exs == 1:
-                return json.loads(self.client.get(key))
+                return json.loads(await self.client.get(key))
             return None
 
         ans = answer['result']['alternatives'][0]['message']
         if exs == 0:
-            self.client.set(key, json.dumps([question, ans]), ex = self.time)
+            await self.client.set(key, json.dumps([question, ans]), ex = self.time)
             return "Complete"
 
-        data = json.loads(self.client.get(key))
+        data = json.loads(await self.client.get(key))
         data.append(question)
         data.append(ans)
-        self.client.set(key, json.dumps(data), ex = self.time)
+        await self.client.set(key, json.dumps(data), ex = self.time)
         return "Complete"
+
