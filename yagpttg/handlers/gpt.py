@@ -51,7 +51,7 @@ async def send_user_gpt_answer(
     try:
         resp = await yagpt.get_answer(str(message.from_user.id), prompt)
     except Exception as e:
-        logger.error("Error while process GPT request: {}", e)
+        logger.error("Error while processing GPT request: {}", e)
         await answer.edit_text("🔌 Во время работы произошла некоторая ошибка.")
     else:
         await answer.edit_text(resp)

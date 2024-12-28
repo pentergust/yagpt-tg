@@ -11,11 +11,10 @@ from aiogram import Bot, Dispatcher
 from aiogram.types import CallbackQuery, ErrorEvent, Message, Update
 from aiogram.utils.token import TokenValidationError
 from loguru import logger
-from tortoise import Tortoise
 
 from yagpttg.api import YandexGPT
 from yagpttg.config import config, default
-from yagpttg.db import User
+from yagpttg.db import Base, SessionLocal, User, engine
 from yagpttg.handlers import ROUTERS
 
 # Константы
@@ -46,15 +45,12 @@ async def game_middleware(
     Для того чтобы добавить нового пользователя, используется форма
     регистрации при первом запуске бота.
     """
-    if isinstance(event, Message):
-        user = await User.get_or_none(id=event.from_user.id)
-    elif isinstance(event, CallbackQuery):
-        if event.message is not None:
-            user = await User.get_or_none(id=event.from_user.id)
+    async with SessionLocal() as session:
+        if isinstance(event, Message | CallbackQuery):
+            user = await session.get(User, event.from_user.id)
         else:
             user = None
-
-    data["user"] = user
+        data["user"] = user
 
     return await handler(event, data)
 
@@ -63,7 +59,6 @@ async def catch_errors(event: ErrorEvent) -> None:
     """Простой обработчик для ошибок."""
     logger.warning(event)
     logger.exception(event.exception)
-
 
 # Главная функция запуска бота
 # ============================
@@ -100,11 +95,8 @@ async def main() -> None:
         logger.debug("Include router {}", router.name)
 
     logger.info("Init db connection ...")
-    await Tortoise.init(
-        db_url=str(config.db_dsn),
-        modules={"models": ["yagpttg.db"]}
-    )
-    await Tortoise.generate_schemas()
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
     logger.success("Start polling!")
     await dp.start_polling(bot,
@@ -113,3 +105,4 @@ async def main() -> None:
             config.yagpt_token.get_secret_value()
         )
     )
+
