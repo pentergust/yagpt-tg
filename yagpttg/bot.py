@@ -13,6 +13,7 @@ from aiogram.utils.token import TokenValidationError
 from loguru import logger
 from tortoise import Tortoise
 
+from yagpttg.api import YandexGPT
 from yagpttg.config import config, default
 from yagpttg.db import User
 from yagpttg.handlers import ROUTERS
@@ -29,6 +30,9 @@ LOG_FORMAT = (
     "{file}:{function} "
     "<lvl>{message}</>"
 )
+
+# Middleware
+# ==========
 
 @dp.message.middleware
 @dp.callback_query.middleware
@@ -53,9 +57,6 @@ async def game_middleware(
     data["user"] = user
 
     return await handler(event, data)
-
-# Middleware
-# ==========
 
 @dp.errors()
 async def catch_errors(event: ErrorEvent) -> None:
@@ -106,4 +107,9 @@ async def main() -> None:
     await Tortoise.generate_schemas()
 
     logger.success("Start polling!")
-    await dp.start_polling(bot)
+    await dp.start_polling(bot,
+        yagpt=YandexGPT(
+            config.folder_id.get_secret_value(),
+            config.yagpt_token.get_secret_value()
+        )
+    )

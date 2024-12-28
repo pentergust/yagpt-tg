@@ -26,7 +26,9 @@ class BotConfig(BaseSettings):
     bot_token: SecretStr
     db_dsn: PostgresDsn
     redis_dsn: RedisDsn
-    ya_gpt_token: SecretStr
+
+    folder_id: SecretStr
+    yagpt_token: SecretStr
 
     # Настраиваем подгрузку из .env файла
     model_config = SettingsConfigDict(

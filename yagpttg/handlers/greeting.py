@@ -16,7 +16,9 @@ from yagpttg.db import User
 
 router = Router(name="Greeting")
 
-# TODO: Действия при первом запуске бота пользователем
+
+# Обработчики
+# ===========
 
 @router.message(CommandStart())
 async def cmd_start(message: Message, user: User | None) -> None:

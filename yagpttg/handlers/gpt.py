@@ -3,26 +3,26 @@
 Позволяет пользователю общаться с YandexGPT.
 """
 
-
-from asyncio import sleep
-
 from aiogram import Bot, Router
 from aiogram.enums import ChatAction
 from aiogram.types import Message
+from loguru import logger
 
+from yagpttg.api import YandexGPT
 from yagpttg.db import User
-
-# from yagpttg.api import yandex_gpt_api
 
 router = Router(name="YandexGPT")
 
-# TODO: Тут мы общаемся с YandexGPT
+
+# Обработчики
+# ===========
 
 @router.message()
 async def send_user_gpt_answer(
     message: Message,
     user: User | None,
-    bot: Bot
+    bot: Bot,
+    yagpt: YandexGPT
 ) -> None:
     """Получаем сообщения юзера и отправляем запрос в YandexGpt.
 
@@ -45,11 +45,14 @@ async def send_user_gpt_answer(
 
     prompt = message.text.strip()
 
-    answer = await message.answer("⏳ Ответ подготавливается...")
+    answer = await message.answer("⏳ Думаю...")
     await bot.send_chat_action(message.chat.id, ChatAction.TYPING)
 
-    # TODO: Вместо sleep() тут разумеется обработка сообщения
-    await sleep(3)
-
-    await answer.edit_text(prompt)
+    try:
+        resp = await yagpt.get_answer(str(message.from_user.id), prompt)
+    except Exception as e:
+        logger.error("Error while process GPT request: {}", e)
+        await answer.edit_text("🔌 Во время работы произошла некоторая ошибка.")
+    else:
+        await answer.edit_text(resp)
 
