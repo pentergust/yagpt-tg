@@ -43,7 +43,7 @@ class YandexGPTAPI:
             async with aiohttp.ClientSession() as session:
                 response = await session.post(url=self.url, headers=self.headers, json=prom)
                 resp = await response.json()
-                await self.rd_bd(key = tg_id, question = text, answer = resp)
+                await self.rd_bd.bd(key = tg_id, question = text, answer = resp)
                 return response['result']['alternatives'][0]['message']
         except Exception as e:
             print(f"Ошибка при запросе к YandexGPT API: {e}")
