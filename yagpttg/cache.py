@@ -47,4 +47,6 @@ class RedisCacheStorage:
         data.append(ans)
         await self.client.set(key, json.dumps(data), ex = self.time)
         return "Complete"
-
+    async def have_user(self, key):
+        key = str(key)
+        return await self.client.exists(key)
