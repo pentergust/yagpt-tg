@@ -1,24 +1,25 @@
 """Обращение к YandexGPI API.
 
 Предоставляет класс для общения с API от имени пользователя.
-
 """
-import asyncio
+
 import aiohttp
-import cache
+from loguru import logger
+
+from yagpttg.cache import RedisCacheStorage
 
 
-class YandexGPTAPI:
+class YandexGPT:
     """Позволяет пользователю обращаться к YandexGPT API."""
 
-    def __init__(self, folder_id, iam_token) -> None:
+    def __init__(self, folder_id: str, iam_token: str) -> None:
         self.url = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
         self.headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {iam_token}"
         }
 
-        self.prompt = {
+        self.request_prompt = {
             "modelUri": f"gpt://{folder_id}/yandexgpt-lite",
             "completionOptions": {
                 "stream": False,
@@ -27,26 +28,29 @@ class YandexGPTAPI:
             },
             "messages": []
         }
-        
-        self.rd_bd = cache.RedisCacheStorage()
 
-    async def get_answer(self, tg_id, text: str) -> dict | None:
+        self.rd_bd = RedisCacheStorage()
+        self._session = aiohttp.ClientSession()
+
+    async def get_answer(self, user_id: str, prompt: str) -> dict | None:
         """Получает ответ на запрос к API."""
-        prom = self.prompt
-        if await self.rd_bd.have_user(key = tg_id) == 1:
-                data = await self.rd_bd.bd(key = tg_id)
-                prom["messages"].extend(data)
-                prom["messages"].append({"role": "user", "text": f"{text}"})
-        
-        try:
-            #session = aiohttp.ClientSession(raise_for_status=True)
-            async with aiohttp.ClientSession() as session:
-                response = await session.post(url=self.url, headers=self.headers, json=prom)
-                resp = await response.json()
-                await self.rd_bd.bd(key = tg_id, question = text, answer = resp)
-                return response['result']['alternatives'][0]['message']
-        except Exception as e:
-            print(f"Ошибка при запросе к YandexGPT API: {e}")
+        request = self.request_prompt.copy()
 
-yandex_gpt_api = YandexGPTAPI("fdfdfd", "dsds")
-asyncio.run(yandex_gpt_api.get_answer(42343, "Привет"))
+        # Дополняем переписку контекстом ранее
+        if await self.rd_bd.have_user(key=user_id) == 1:
+            messages = await self.rd_bd.bd(key=user_id)
+            request["messages"].extend(messages)
+            request["messages"].append({"role": "user", "text": f"{prompt}"})
+
+        # Выполняем запрос к GPT
+        try:
+            response = await self._session.post(
+                url=self.url,
+                headers=self.headers,
+                json=request
+            )
+            json_resp = await response.json()
+            await self.rd_bd.bd(key=user_id, prompt=prompt, answer=json_resp)
+            return response['result']['alternatives'][0]['message']
+        except Exception as e:
+            logger.error("Ошибка при запросе к YandexGPT API: {}", e)
