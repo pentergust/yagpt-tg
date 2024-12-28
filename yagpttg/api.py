@@ -9,6 +9,9 @@ from loguru import logger
 from yagpttg.cache import RedisCacheStorage
 
 
+class YandexAPIError(Exception):
+    """Если что-то во время работы с GPT пошло не по плану."""
+
 class YandexGPT:
     """Позволяет пользователю обращаться к YandexGPT API."""
 
@@ -37,20 +40,21 @@ class YandexGPT:
         request = self.request_prompt.copy()
 
         # Дополняем переписку контекстом ранее
-        if await self.rd_bd.have_user(key=user_id) == 1:
+        if await self.rd_bd.have_user(user=user_id) == 1:
             messages = await self.rd_bd.bd(key=user_id)
             request["messages"].extend(messages)
             request["messages"].append({"role": "user", "text": f"{prompt}"})
 
         # Выполняем запрос к GPT
-        try:
-            response = await self._session.post(
-                url=self.url,
-                headers=self.headers,
-                json=request
-            )
-            json_resp = await response.json()
-            await self.rd_bd.bd(key=user_id, prompt=prompt, answer=json_resp)
-            return response['result']['alternatives'][0]['message']
-        except Exception as e:
-            logger.error("Ошибка при запросе к YandexGPT API: {}", e)
+        response = await self._session.post(
+            url=self.url,
+            headers=self.headers,
+            json=request
+        )
+        json_resp = await response.json()
+        logger.debug(json_resp)
+        if "error" in json_resp:
+            raise YandexAPIError(json_resp)
+
+        await self.rd_bd.bd(key=user_id, prompt=prompt, answer=json_resp)
+        return json_resp['result']['alternatives'][0]['message']
