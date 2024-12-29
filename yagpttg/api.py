@@ -36,7 +36,7 @@ class YandexGPT:
 
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {await rd_bd.iamtoken()}"
+            "Authorization": f"Bearer {await self.rd_bd.iamtoken()}"
         }
         # Дополняем переписку контекстом ранее
         if await self.rd_bd.have_user(user=user_id) == 1:
@@ -47,7 +47,7 @@ class YandexGPT:
         # Выполняем запрос к GPT
         response = await self._session.post(
             url=self.url,
-            headers=self.headers,
+            headers=headers,
             json=request
         )
         json_resp = await response.json()

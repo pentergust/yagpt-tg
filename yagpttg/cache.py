@@ -4,7 +4,7 @@ import json
 
 from redis.asyncio import Redis
 
-from yagpttg.Yandextoken import Iam_Tokem
+from yagpttg.Yandextoken import IamTokem
 
 # Константы
 # =========
@@ -30,7 +30,7 @@ class RedisCacheStorage:
         """
         self.client = client or Redis()
         self.ttl = ttl if isinstance(ttl, int) else _CACHE_TIME
-        self.tokens = Iam_Tokem()
+        self.tokens = IamTokem()
 
     async def bd(self,
         key: str,
@@ -64,10 +64,10 @@ class RedisCacheStorage:
         """Проверяет что пользователь есть в кеш хранилище."""
         return await self.client.exists(user) == 1
 
-    async def imtoken(self):
+    async def imtoken(self) -> str | None:
         if await self.client.exists("imkey") == 0:
             token = await self.tokens.get_token()
-            await self.client.set(key, token, ex = self.ttl)
+            await self.client.set("imkey", token, ex=self.ttl)
         else:
             token = await self.client.get("imkey")
         return token
