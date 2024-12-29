@@ -12,7 +12,7 @@ from aiogram.filters import CommandStart
 from aiogram.types import CallbackQuery, Message
 
 from yagpttg import keyboards, messages
-from yagpttg.db import User
+from yagpttg.db import SessionLocal, User
 
 router = Router(name="Greeting")
 
@@ -28,17 +28,20 @@ async def cmd_start(message: Message, user: User | None) -> None:
     else:
         await message.answer(messages.START_WORK)
 
-@router.callback_query(F.data=="reg")
+@router.callback_query(F.data == "reg")
 async def register_user_call(query: CallbackQuery, user: User | None) -> None:
     """Регистрирует нового пользователя."""
     if user is not None:
         return await query.answer("🍓 Вы уже проходили регистрацию.")
 
-    user = await User.create(
-        id=query.from_user.id,
-        first_name=query.from_user.first_name,
-        last_name=query.from_user.first_name
-    )
+    async with SessionLocal() as session:
+        user = User(
+            id=query.from_user.id,
+            first_name=query.from_user.first_name,
+            last_name=query.from_user.last_name
+        )
+        session.add(user)
+        await session.commit()
 
     await query.message.answer(messages.START_WORK)
     await query.answer("🍓 Регистрация прошла успешно.")
