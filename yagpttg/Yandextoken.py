@@ -1,9 +1,10 @@
-import time
-import jwt
 import json
-import asyncio
-from loguru import logger
+import time
+
 import aiohttp
+import jwt
+from loguru import logger
+
 
 class Iam_Tokem:
 
@@ -11,8 +12,8 @@ class Iam_Tokem:
     def __init__(self, filename: str | None = None) -> None:
         if filename is None:
             filename = 'yagpttg/key.json'
-        with open(filename, 'r') as f: 
-            obj = f.read() 
+        with open(filename) as f:
+            obj = f.read()
             obj = json.loads(obj)
             self.private_key = obj['private_key']
             self.key_id = obj['id']

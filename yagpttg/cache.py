@@ -1,8 +1,10 @@
 """Кеширование запросов к API."""
 
 import json
-from yagpttg.Yandextoken import Iam_Tokem
+
 from redis.asyncio import Redis
+
+from yagpttg.Yandextoken import Iam_Tokem
 
 # Константы
 # =========
