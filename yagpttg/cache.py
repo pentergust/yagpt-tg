@@ -1,7 +1,7 @@
 """Кеширование запросов к API."""
 
 import json
-
+from yagpttg.Yandextoken import Iam_Tokem
 from redis.asyncio import Redis
 
 # Константы
@@ -28,6 +28,7 @@ class RedisCacheStorage:
         """
         self.client = client or Redis()
         self.ttl = ttl if isinstance(ttl, int) else _CACHE_TIME
+        self.tokens = Iam_Tokem()
 
     async def bd(self,
         key: str,
@@ -54,9 +55,19 @@ class RedisCacheStorage:
         data = json.loads(await self.client.get(key))
         data.append(prompt)
         data.append(ans)
-        await self.client.set(key, json.dumps(data), ex = self.time)
+        await self.client.set(key, json.dumps(data), ex = self.ttl)
         return "Complete"
 
     async def have_user(self, user: str) -> bool:
         """Проверяет что пользователь есть в кеш хранилище."""
         return await self.client.exists(user) == 1
+
+    async def imtoken(self):
+        if await self.client.exists("imkey") == 0:
+            token = await self.tokens.get_token()
+            await self.client.set(key, token, ex = self.ttl)
+        else:
+            token = await self.client.get("imkey")
+        return token
+
+

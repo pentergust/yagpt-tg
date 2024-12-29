@@ -15,13 +15,8 @@ class YandexAPIError(Exception):
 class YandexGPT:
     """Позволяет пользователю обращаться к YandexGPT API."""
 
-    def __init__(self, folder_id: str, iam_token: str) -> None:
+    def __init__(self, folder_id: str) -> None:
         self.url = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
-        self.headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {iam_token}"
-        }
-
         self.request_prompt = {
             "modelUri": f"gpt://{folder_id}/yandexgpt-lite",
             "completionOptions": {
@@ -39,6 +34,10 @@ class YandexGPT:
         """Получает ответ на запрос к API."""
         request = self.request_prompt.copy()
 
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {await rd_bd.iamtoken()}"
+        }
         # Дополняем переписку контекстом ранее
         if await self.rd_bd.have_user(user=user_id) == 1:
             messages = await self.rd_bd.bd(key=user_id)
