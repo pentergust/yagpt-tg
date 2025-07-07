@@ -1,28 +1,25 @@
-[tool.poetry]
-name = "yagpttg"
+[project]
+name = "yagpt-tg"
 version = "0.1.0"
 description = "YandexGPT in your Telegram chats!"
-authors = ["Milinuri Nirvalen <pentergust@mail.ru>"]
+authors = [{ name = "Milinuri Nirvalen", email = "<pentergust@mail.ru>" }]
 license = "GPL-3.0-or-later"
 readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "aiogram>=3.21.0",
+    "asyncpg>=0.30.0",
+    "loguru>=0.7.3",
+    "pydantic-settings>=2.10.1",
+    "redis>=6.2.0",
+    "tortoise-orm>=0.25.1",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-aiogram = "^3.16.0"
-loguru = "^0.7.3"
-tortoise-orm = "^0.23.0"
-asyncpg = "^0.30.0"
-aioredis = "^2.0.1"
-pydantic-settings = "^2.7.1"
-redis = "^5.2.1"
-aiohttp = "^3.11.11"
-
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.11.2"
+# Ruff configure ---------------------------------------------------------------
 
 [tool.ruff]
 line-length = 80
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.lint]
 select = ["F", "E", "W", "I", "N", "D", "UP", "ANN"]
@@ -31,7 +28,3 @@ ignore = ["D107", "D212", "D213", "D203", "D413"]
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
